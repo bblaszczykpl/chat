@@ -12,12 +12,9 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
   <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
-  <title>Dashboard - Tabler - Premium and Open Source dashboard template with responsive and high quality UI.</title>
+  <title>Chat demo</title>
   <!-- CSS files -->
   <link href="/assets/dist/css/tabler.min.css?1692870487" rel="stylesheet"/>
-  <link href="/assets/dist/css/tabler-flags.min.css?1692870487" rel="stylesheet"/>
-  <link href="/assets/dist/css/tabler-payments.min.css?1692870487" rel="stylesheet"/>
-  <link href="/assets/dist/css/tabler-vendors.min.css?1692870487" rel="stylesheet"/>
   <link href="/assets/dist/css/demo.min.css?1692870487" rel="stylesheet"/>
   <style>
     @import url('https://rsms.me/inter/inter.css');
@@ -30,11 +27,8 @@
   </style>
 </head>
 <!--<body >-->
-<script src="/assets/dist/js/demo-theme.min.js?1692870487"></script>
 <div class="page">
-  {{ block "sidebar" .}}{{ end }}
 
-  {{ block "header" .}}{{ end }}
 
   <div id="mainContent" class="page-wrapper">
   {{block "content" .}}{{end}}
@@ -45,34 +39,37 @@
 </div>
 <!-- Tabler Core -->
 <script src="/assets/dist/js/tabler.min.js?1692870487" defer></script>
-<script src="/assets/dist/js/demo.min.js?1692870487" defer></script>
 
-<script src="https://unpkg.com/htmx.org@1.9.10"></script>
-<script src="/assets/dist/libs/list.js/dist/list.min.js?1692870487" defer></script>
+<script src="https://unpkg.com/htmx.org@1.9.11"></script>
+<script src="https://unpkg.com/htmx.org@1.9.11/dist/ext/ws.js"></script>
 
 
 <script>
-  document.addEventListener('htmx:afterSwap', function() {
-    const list = new List('table-default', {
-      sortClass: 'table-sort',
-      listClass: 'table-tbody',
-      valueNames: [ 'sort-name', 'sort-type', 'sort-city', 'sort-score',
-        { attr: 'data-date', name: 'sort-date' },
-        { attr: 'data-progress', name: 'sort-progress' },
-        'sort-quantity'
-      ]
-    });
+  document.addEventListener('htmx:wsAfterSend', function(w) {
+    var text = JSON.parse(w.detail.message)
+    var template = document.getElementById('chatItemTemplate')
+    var bubble = template.cloneNode(true)
+    bubble.id = '';
+    bubble.style.visibility = 'visible'
+    var bubbles = document.getElementById('chatBubbles')
+    var child = bubble.children[0]
+    child.classList.add('justify-content-end')
+    var content = bubble.getElementsByClassName('messageContent')[0]
+    content.textContent = text.message
+    bubbles.appendChild(bubble)
+    document.getElementById('message').value = ''
   })
-  document.addEventListener("DOMContentLoaded", function() {
-    const list = new List('table-default', {
-      sortClass: 'table-sort',
-      listClass: 'table-tbody',
-      valueNames: [ 'sort-name', 'sort-type', 'sort-city', 'sort-score',
-        { attr: 'data-date', name: 'sort-date' },
-        { attr: 'data-progress', name: 'sort-progress' },
-        'sort-quantity'
-      ]
-    });
+
+  document.addEventListener('htmx:wsAfterMessage', function(w) {
+    var text = JSON.parse(w.detail.message)
+    var template = document.getElementById('chatItemTemplate')
+    var bubble = template.cloneNode(true)
+    bubble.id = '';
+    bubble.style.visibility = 'visible'
+    var bubbles = document.getElementById('chatBubbles')
+    var content = bubble.getElementsByClassName('messageContent')[0]
+    content.textContent = text.message
+    bubbles.appendChild(bubble)
   })
 </script>
 </body>
